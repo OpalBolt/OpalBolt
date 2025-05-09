@@ -1,0 +1,30 @@
+{
+    "configurations": [
+      {
+        "type": "debugpy",
+        "request": "launch",
+        "name": "Launch Game",
+        "program": "${workspaceFolder}/src/game.py",
+        "console": "integratedTerminal",
+        "args": [
+          "${input:command}",
+          "--game-id",
+          "${input:gameId}"
+        ],
+        "justMyCode": true
+      }
+    ],
+    "inputs": [
+      {
+        "id": "command",
+        "type": "pickString",
+        "description": "Command to run",
+        "options": ["roll-player", "roll-oponent"]
+      },
+      {
+        "id": "gameId",
+        "type": "promptString",
+        "description": "Game ID (optional)"
+      }
+    ]
+  }
