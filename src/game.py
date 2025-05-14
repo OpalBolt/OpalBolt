@@ -21,7 +21,7 @@ import typer
 from oponent_logic import oponent_play_round
 from models import game_data
 from helper import save_game_data, save_round_data, load_game_data, save_meta_roll, load_meta_roll
-
+from game_logic import check_game_end
 
 starting_dice = 6
 app = typer.Typer()
@@ -45,9 +45,13 @@ def roll_oponent(game_id: int = None):
 
     game.game_score_opponent += current_round.round_score
     print(game)
+    
+    check_game_end(game)
+
 
     save_game_data(game, 1)
     save_round_data(current_round, 1, 1)
+
     
     return game
 

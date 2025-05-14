@@ -15,6 +15,7 @@ class turn_data:
     next_roll_dice: int
     score: int
     used_dice: int
+    
 
 @dataclass
 class round_data:
