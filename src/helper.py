@@ -122,29 +122,52 @@ def load_round_data(game_id, round_id) -> round_data:
     return round
 
 
+def load_meta() -> meta_data:
     """
-    Load meta roll data from a JSON file.
+    Load meta data from a JSON file.
     """
 
     # Define the path to the JSON file
-    json_file_path = define_save_path('meta', 'rolls')
-    create_folder_structure(json_file_path)
+    json_file_path = define_save_path("meta", "meta")
+
+    if not os.path.exists(json_file_path):
+        return meta_data(
+            game_id=0,
+            round_id=0,
+            turn_id=0,
+        )
 
     # Load the JSON data
-    with open(json_file_path, 'r') as file:
+    with open(json_file_path, "r") as file:
         loaded_data = json.load(file)
 
-    return loaded_data
+    meta = meta_data(
+        game_id=loaded_data["game_id"],
+        round_id=loaded_data["round_id"],
+        turn_id=loaded_data["turn_id"],
+    )
 
-def save_meta_roll(roll: dict) -> None:
+    return meta
+
+
+def save_meta(meta: meta_data) -> None:
     """
-    Save meta roll data to a JSON file.
+    Save meta data to a JSON file.
     """
+
+    # Convert the meta data to a dictionary
+    meta_json = {
+        "game_id": meta.game_id,
+        "round_id": meta.round_id,
+        "turn_id": meta.turn_id,
+    }
 
     # Define the path to the JSON file
-    json_file_path = define_save_path('meta', 'rolls')
+    json_file_path = define_save_path("meta", "meta")
     create_folder_structure(json_file_path)
 
     # Save the JSON data
-    with open(json_file_path, 'w') as file:
-        json.dump(roll, file, indent=4)
+    with open(json_file_path, "w") as file:
+        json.dump(meta_json, file, indent=4)
+
+
