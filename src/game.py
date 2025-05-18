@@ -12,16 +12,28 @@
 #       - Score with all six dice (must reroll all).
 #       Must score 800+ in one turn to get "on the board."
 
-# Incomming data: 
+# Incomming data:
 # choice: roll, bank, or end
 # dice: list of the dice to keep
 # player: the player making the choice
 
+from typing import Optional
+
 import typer
-from oponent_logic import oponent_play_round
-from models import game_data
-from helper import save_game_data, save_round_data, load_game_data, save_meta_roll, load_meta_roll
+
 from game_logic import check_game_end
+from helper import (
+    load_game_data,
+    load_meta,
+    load_round_data,
+    load_turn_data,
+    save_game_data,
+    save_meta,
+    save_round_data,
+)
+from models import game_data, meta_data, round_data
+from oponent_logic import oponent_play_round
+from player_logic import player_play_round
 
 starting_dice = 6
 app = typer.Typer()

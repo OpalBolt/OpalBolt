@@ -1,6 +1,8 @@
 import json
 import os
-from models import game_data, round_data
+from typing import MutableMapping
+from models import game_data, round_data, meta_data
+
 
 def create_folder_structure(path: str) -> None:
     os.makedirs(os.path.dirname(path), exist_ok=True)
