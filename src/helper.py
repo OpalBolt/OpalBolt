@@ -1,17 +1,15 @@
 import json
 import os
 from typing import MutableMapping
-from models import game_data, round_data, meta_data
+from models import game_data, round_data, meta_data, turn_data
 
 
 def create_folder_structure(path: str) -> None:
     os.makedirs(os.path.dirname(path), exist_ok=True)
 
 
-def define_save_path(file_name: str, filename) -> str:
-    return os.path.join(
-        os.path.dirname(__file__), "..", file_name, f"game_data_{filename}.json"
-    )
+def define_save_path(file_name: str, filename: str) -> str:
+    return os.path.join(os.path.dirname(__file__), "..", file_name, f"{filename}.json")
 
 
 def load_game_data(game_id: int) -> game_data:
@@ -20,7 +18,7 @@ def load_game_data(game_id: int) -> game_data:
     """
 
     # Define the path to the JSON file
-    json_file_path = define_save_path("games", game_id)
+    json_file_path = define_save_path("games", f"game_data_{game_id}")
 
     if not os.path.exists(json_file_path):
         return game_data(
@@ -52,7 +50,7 @@ def save_game_data(game: game_data, game_id: int) -> None:
     }
 
     # Define the path to the JSON file
-    json_file_path = define_save_path("games", game_id)
+    json_file_path = define_save_path("games", f"game_data_{game_id}")
     create_folder_structure(json_file_path)
 
     # Save the JSON data
@@ -86,7 +84,7 @@ def save_round_data(round: round_data, game_id: int, round_id: int) -> None:
     }
 
     # Define the path to the JSON file
-    json_file_path = define_save_path("rounds", f"{game_id}_{round_id}")
+    json_file_path = define_save_path("rounds", f"round_data_{game_id}_{round_id}")
     create_folder_structure(json_file_path)
 
     # Save the JSON data
@@ -96,7 +94,7 @@ def save_round_data(round: round_data, game_id: int, round_id: int) -> None:
 
 def load_round_data(game_id, round_id) -> round_data:
     # Define the path to the JSON file
-    json_file_path = define_save_path("round", f"{game_id}_{round_id}")
+    json_file_path = define_save_path("round", f"round_data_{game_id}_{round_id}")
 
     if not os.path.exists(json_file_path):
         return round_data(
@@ -128,7 +126,7 @@ def load_meta() -> meta_data:
     """
 
     # Define the path to the JSON file
-    json_file_path = define_save_path("meta", "meta")
+    json_file_path = define_save_path("meta", "meta_data")
 
     if not os.path.exists(json_file_path):
         return meta_data(
@@ -163,7 +161,7 @@ def save_meta(meta: meta_data) -> None:
     }
 
     # Define the path to the JSON file
-    json_file_path = define_save_path("meta", "meta")
+    json_file_path = define_save_path("meta", "meta_data")
     create_folder_structure(json_file_path)
 
     # Save the JSON data
