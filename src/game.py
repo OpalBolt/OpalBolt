@@ -58,7 +58,7 @@ def roll_player(game_id: int, player: str, dice: int):
         _tmp_meta.turn_id -= 1
         last_turn = load_turn_data(_tmp_meta)
         current_turn = player_play_round(
-            last_turn.avalible_dice, game_meta=game_meta, player=player
+            last_turn.next_roll_dice, game_meta=game_meta, player=player
         )
 
 
