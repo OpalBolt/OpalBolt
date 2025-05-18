@@ -169,3 +169,33 @@ def save_meta(meta: meta_data) -> None:
         json.dump(meta_json, file, indent=4)
 
 
+def load_turn_data(meta: meta_data) -> turn_data:
+    """
+    Load turn data to a dataclass
+    """
+
+    # Define the path to the JSON file
+    json_file_path = define_save_path(
+        "turn", f"turn_data_{meta.game_id}_{meta.round_id}_{meta.turn_id}"
+    )
+
+    if not os.path.exists(json_file_path):
+        return turn_data(
+            avalible_dice=[],
+            next_roll_dice=0,
+            score=0,
+            used_dice=0,
+        )
+
+    # Load the JSON data
+    with open(json_file_path, "r") as file:
+        loaded_data = json.load(file)
+
+    turn = turn_data(
+        avalible_dice=loaded_data["avalible_dice"],
+        next_roll_dice=loaded_data["next_roll_dice"],
+        score=loaded_data["score"],
+        used_dice=loaded_data["used_dice"],
+    )
+
+    return turn
