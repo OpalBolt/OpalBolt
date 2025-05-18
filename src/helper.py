@@ -94,6 +94,34 @@ def save_round_data(round: round_data, game_id: int, round_id: int) -> None:
         json.dump(round_json, file, indent=4)
 
 
+def load_round_data(game_id, round_id) -> round_data:
+    # Define the path to the JSON file
+    json_file_path = define_save_path("round", f"{game_id}_{round_id}")
+
+    if not os.path.exists(json_file_path):
+        return round_data(
+            player="none",
+            round_score=0,
+            turn=[],
+            rolls=[],
+            dice_left=0,
+        )
+
+    # Load the JSON data
+    with open(json_file_path, "r") as file:
+        loaded_data = json.load(file)
+
+    round = round_data(
+        player=loaded_data[""],
+        round_score=loaded_data[""],
+        turn=loaded_data[""],
+        rolls=loaded_data[""],
+        dice_left=loaded_data[""],
+    )
+
+    return round
+
+
     """
     Load meta roll data from a JSON file.
     """
