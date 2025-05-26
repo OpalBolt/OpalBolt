@@ -31,6 +31,8 @@
           pythonEnv = python.withPackages (
             ps: with ps; [
               typer
+              typing
+              pydantic
 
               # Testing (essential for dev workflow)
               pytest

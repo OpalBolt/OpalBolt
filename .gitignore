@@ -182,4 +182,4 @@ result-*
 # Uncomment these if you don't want to track game data in git
 games/
 meta/
-rounds/
+round/
