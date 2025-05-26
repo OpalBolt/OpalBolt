@@ -71,3 +71,12 @@ def check_game_end(game: game_data) -> game_data:
         game.game_ended = True
 
     return game
+
+
+# converts the dice int to a string
+# Iritiate over the string, and then puts this into
+# the list as a int.
+def find_dice_to_keep(dice: Optional[int]) -> Optional[list[int]]:
+    if dice:
+        return [int(d) for d in str(dice)]
+    return None
