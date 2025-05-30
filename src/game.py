@@ -79,20 +79,30 @@ def roll_player(game_id: int, player: str, choice: str, dice_to_keep: list):
 
     make_checks(game_meta, current_game, current_round)
 
-def make_checks(game_meta: meta_data, game: game_data, current_round: round_data):
-    check_game_end(game)
-    save_game_data(game, game_meta.game_id)
-    save_round_data(current_round, game_meta.game_id, game_meta.round_id)
-    game_meta.round_id += 1
-    save_meta(game_meta)
+    return current_game
 
-    if game.game_ended:
+
+def make_checks(
+    game_meta: meta_data, current_game: game_data, current_round: round_data
+):
+    check_game_end(current_game)
+    current_game.save(f"_{game_meta.game_id}")
+    current_round.save(f"_{game_meta.game_id}_{game_meta.round_id}")
+    game_meta.turn_id += 1
+    game_meta.save()
+
+    if current_round.end:
+        game_meta.round_id += 1
+        game_meta.turn_id = 0
+        game_meta.save()
+
+    if current_game.game_ended:
         game_meta.game_id += 1
         game_meta.round_id = 0
-        game.game_score_player = 0
-        game.game_score_opponent = 0
-        save_meta(game_meta)
-        save_game_data(game, game_meta.game_id)
+        current_game.game_score_player = 0
+        current_game.game_score_opponent = 0
+        game_meta.save()
+        current_game.save(f"_{game_meta.game_id}")
 
 
 @app.command()
