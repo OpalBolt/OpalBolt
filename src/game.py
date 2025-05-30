@@ -19,7 +19,9 @@
 
 from typing import Optional
 
+import structlog
 import typer
+import logging
 
 from game_logic import check_game_end
 from helper import (
@@ -37,6 +39,15 @@ from player_logic import player_play_round
 
 starting_dice = 6
 app = typer.Typer()
+
+
+structlog.stdlib.recreate_defaults()
+log = structlog.get_logger(__name__)
+
+# structlog.configure(wrapper_class=structlog.make_filtering_bound_logger(logging.DEBUG))
+logging.basicConfig(
+    level=logging.DEBUG,
+)
 
 
 @app.command()
