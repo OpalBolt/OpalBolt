@@ -20,24 +20,14 @@
 from typing import Optional
 
 import structlog
+from game_logic import calculate_score_roll, check_game_end, roll_dice
 import typer
 import logging
 
-from game_logic import check_game_end
-from helper import (
-    load_game_data,
-    load_meta,
-    load_round_data,
-    load_turn_data,
-    save_game_data,
-    save_meta,
-    save_round_data,
-)
-from models import game_data, meta_data, round_data
+from models import game_data, meta_data, round_data, turn_data
 from oponent_logic import oponent_play_round
 from player_logic import player_play_round
 
-starting_dice = 6
 app = typer.Typer()
 
 
