@@ -106,25 +106,24 @@ def test_save():
 
 @app.command()
 def roll_game(game_id: Optional[int] = None, player: str = "oponent"):
-    game_meta = load_meta()
+    game_meta = meta_data.load()
 
     if game_id:
-        game = load_game_data(game_id)
+        current_game = game_data.load(f"_{str(game_id)}")
     else:
-        game = load_game_data(game_meta.game_id)
+        current_game = game_data.load(f"_{game_meta.game_id}")
 
-    if player != "oponent":
-        player_play_round(
-            num_dice_input=starting_dice, game_meta=game_meta, player=player
-        )
-    else:
-        current_round = oponent_play_round(starting_dice)
+    current_round = round_data.load(f"_{game_meta.game_id}_{game_meta.round_id}")
 
-    game.game_score_opponent += current_round.round_score
+    current_round = oponent_play_round(current_round.next_roll_dice, current_round)
 
-    make_checks(game_meta, game, current_round)
+    current_game.game_score_opponent += current_round.round_score
 
-    return game
+    game_meta.avalible_dice = roll_dice(6)
+
+    make_checks(game_meta, current_game, current_round)
+
+    return current_game
 
 
 def main():
