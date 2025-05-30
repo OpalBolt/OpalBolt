@@ -106,6 +106,15 @@ def make_checks(
 
 
 @app.command()
+def test_save():
+    # game_meta = meta_data(game_id=4, round_id=29)
+    game_meta = meta_data.load()
+    log.info(game_meta)
+    current_round = round_data.load(f"_{game_meta.game_id}_{game_meta.round_id}")
+    log.info(current_round)
+
+
+@app.command()
 def roll_game(game_id: Optional[int] = None, player: str = "oponent"):
     game_meta = load_meta()
 
