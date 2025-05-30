@@ -51,27 +51,33 @@ logging.basicConfig(
 
 
 @app.command()
-def roll_player(game_id: int, player: str, dice: int):
-    game_meta = load_meta()
+def roll_player(game_id: int, player: str, choice: str, dice_to_keep: list):
+    game_meta = meta_data.load()
 
     if game_id:
-        game = load_game_data(game_id)
+        current_game = game_data.load(f"_{str(game_id)}")
     else:
-        game_id = game_meta.game_id
-        game = load_game_data(game_meta.game_id)
+        current_game = game_data.load(f"_{game_meta.game_id}")
 
-    current_round = load_round_data(game_meta.game_id, game_meta.round_id)
+    current_round = round_data.load(f"_{game_meta.game_id}_{game_meta.round_id}")
+    current_round.player = player
 
-    if game_meta.turn_id == 0:
-        current_turn = player_play_round(starting_dice, game_meta, player)
+    turn = calculate_score_roll(game_meta.avalible_dice, turn_data(), dice_to_keep)
+
+    if turn.score == 0:
+        current_round.round_score = 0
+        turn.save(f"_{game_meta.game_id}_{game_meta.round_id}_{game_meta.turn_id}")
+        return None
+
+    current_round.round_score += turn.score
+    turn.save(f"_{game_meta.game_id}_{game_meta.round_id}_{game_meta.turn_id}")
+
+    if choice == "keep":
+        current_round.end = True
     else:
-        _tmp_meta = game_meta
-        _tmp_meta.turn_id -= 1
-        last_turn = load_turn_data(_tmp_meta)
-        current_turn = player_play_round(
-            last_turn.next_roll_dice, game_meta=game_meta, player=player
-        )
+        game_meta.avalible_dice = roll_dice(turn.dice_left)
 
+    make_checks(game_meta, current_game, current_round)
 
 def make_checks(game_meta: meta_data, game: game_data, current_round: round_data):
     check_game_end(game)
