@@ -17,13 +17,13 @@
 # dice: list of the dice to keep
 # player: the player making the choice
 
+import logging
 from typing import Optional
 
 import structlog
-from game_logic import calculate_score_roll, check_game_end, roll_dice
 import typer
-import logging
 
+from game_logic import calculate_score_roll, check_game_end, roll_dice
 from models import game_data, meta_data, round_data, turn_data
 from oponent_logic import oponent_play_round
 from player_logic import player_play_round
