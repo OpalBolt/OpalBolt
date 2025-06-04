@@ -1,6 +1,9 @@
 import json
 import os
-from typing import MutableMapping
+from typing import MutableMapping, Optional, Any
+from functools import singledispatch
+
+from click.shell_completion import _resolve_incomplete
 from models import game_data, round_data, meta_data, turn_data
 
 
@@ -63,24 +66,23 @@ def save_round_data(round: round_data, game_id: int, round_id: int) -> None:
     Save round data to a JSON file.
     """
 
-    if round.round_score == 0:
-        _lost = True
-    else:
-        _lost = False
-
-    turn_count = 0
-    if hasattr(round, "turn"):
-        if isinstance(round.turn, list):
-            turn_count = len(round.turn)
-        else:
-            print(f"Warning: round.turn is not a list, it's a {type(round.turn)}")
+    turns = []
+    for turn in round.rolls:
+        turns.append(
+            {
+                "avalible_dice": turn.avalible_dice,
+                "score": turn.score,
+                "dice_left": turn.dice_left,
+            }
+        )
 
     round_json = {
-        "round_id": round_id,
-        "round_player": round.player,
-        "round_rolls": len(round.rolls),
-        "round_lost": _lost,
+        "next_roll_dice": round.next_roll_dice,
+        "player": round.player,
+        "rolls": turns,
         "round_score": round.round_score,
+        "dice_left": round.dice_left,
+        "end": round.end,
     }
 
     # Define the path to the JSON file
@@ -98,23 +100,35 @@ def load_round_data(game_id, round_id) -> round_data:
 
     if not os.path.exists(json_file_path):
         return round_data(
+            next_roll_dice=6,
             player="none",
             round_score=0,
-            turn=[],
             rolls=[],
             dice_left=0,
+            end=False,
         )
 
     # Load the JSON data
     with open(json_file_path, "r") as file:
         loaded_data = json.load(file)
 
+    rolls = []
+    for turn in loaded_data.rounds:
+        rolls.append(
+            turn_data(
+                avalible_dice=turn["avalible_dice"],
+                score=turn["score"],
+                dice_left=turn["dice_left"],
+            )
+        )
+
     round = round_data(
-        player=loaded_data[""],
-        round_score=loaded_data[""],
-        turn=loaded_data[""],
-        rolls=loaded_data[""],
-        dice_left=loaded_data[""],
+        next_roll_dice=loaded_data["next_roll_dice"],
+        player=loaded_data["player"],
+        round_score=loaded_data["round_score"],
+        rolls=loaded_data["rolls"],
+        dice_left=loaded_data["round_dice_left"],
+        end=loaded_data["end"],
     )
 
     return round
@@ -182,9 +196,8 @@ def load_turn_data(meta: meta_data) -> turn_data:
     if not os.path.exists(json_file_path):
         return turn_data(
             avalible_dice=[],
-            next_roll_dice=0,
             score=0,
-            used_dice=0,
+            dice_left=6,
         )
 
     # Load the JSON data
@@ -193,9 +206,111 @@ def load_turn_data(meta: meta_data) -> turn_data:
 
     turn = turn_data(
         avalible_dice=loaded_data["avalible_dice"],
-        next_roll_dice=loaded_data["next_roll_dice"],
         score=loaded_data["score"],
-        used_dice=loaded_data["used_dice"],
+        dice_left=loaded_data["used_dice"],
     )
 
     return turn
+
+
+@singledispatch
+def pydantic_saver(thing):
+    pass
+
+
+@pydantic_saver.register(meta_data, None)
+def _(metadata: meta_data) -> None:
+    json_file_path = define_save_path("meta_test", "meta_data")
+    save_data(metadata, json_file_path)
+
+
+@pydantic_saver.register(round_data)
+def _(rounddata: round_data, metadata: meta_data) -> None:
+    json_file_path = define_save_path(
+        "rounds", f"round_data_{metadata.game_id}_{metadata.round_id}"
+    )
+    save_data(rounddata, json_file_path)
+
+
+@pydantic_saver.register(turn_data)
+def _(turndata: turn_data, metadata: meta_data) -> None:
+    json_file_path = define_save_path(
+        "turn", f"turn_data_{metadata.game_id}_{metadata.round_id}_{metadata.turn_id}"
+    )
+    save_data(turndata, json_file_path)
+
+
+def save_data(data, json_file_path) -> None:
+    create_folder_structure(json_file_path)
+    with open(json_file_path, "w") as file:
+        file.write(data.model_dump_json())
+
+
+@singledispatch
+def pydantic_loader(thing) -> Any:
+    pass
+
+
+@pydantic_loader.register(meta_data)
+def _(metadata: meta_data) -> meta_data:
+    json_file_path = define_save_path("meta", "meta_data")
+
+    if not os.path.exists(json_file_path):
+        return metadata
+
+    # Load the JSON data
+    with open(json_file_path, "r") as file:
+        dict_data = json.load(file)
+
+    loaded_data = meta_data.model_validate(dict_data)
+
+    return loaded_data
+
+
+@pydantic_loader.register(game_data)
+def _(gamedata: game_data, metadata: meta_data) -> game_data:
+    json_file_path = define_save_path("games", f"game_data_{metadata.game_id}")
+    json_data = check_and_load_data(json_file_path)
+    if json_data:
+        return gamedata
+
+    loaded_data = game_data.model_validate(json_data)
+
+    return loaded_data
+
+
+def check_and_load_data(filepath: str) -> bool | dict:
+    if not os.path.exists(filepath):
+        return False
+
+    with open(filepath, "r") as file:
+        dict_data = json.load(file)
+    return dict_data
+
+
+def p_load_meta() -> meta_data:
+    json_file_path = define_save_path("meta", "meta_data")
+
+    if not os.path.exists(json_file_path):
+        return meta_data()
+
+    # Load the JSON data
+    with open(json_file_path, "r") as file:
+        dict_data = json.load(file)
+
+        loaded_data = meta_data.model_validate(dict_data)
+
+    return loaded_data
+
+
+def p_load_data(
+    datatype: str, metadata: meta_data
+) -> game_data | round_data | turn_data | None:
+    if datatype == "game_data":
+        return None
+    if datatype == "round_data":
+        return None
+    if datatype == "turn_data":
+        return None
+
+    pass
