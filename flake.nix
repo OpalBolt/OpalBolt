@@ -33,6 +33,11 @@
               typer
               typing
               pydantic
+              structlog
+              flake8
+              isort
+              bandit
+              autoflake
 
               # Testing (essential for dev workflow)
               pytest

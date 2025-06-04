@@ -180,6 +180,7 @@ result-*
 
 # Project specific - OpalBolt
 # Uncomment these if you don't want to track game data in git
-games/
+game/
 meta/
 round/
+turn/
