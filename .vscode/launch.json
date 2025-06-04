@@ -19,7 +19,7 @@
         "id": "command",
         "type": "pickString",
         "description": "Command to run",
-        "options": ["roll-player", "roll-oponent"]
+        "options": ["roll-game", "roll-oponent"]
       },
       {
         "id": "gameId",
