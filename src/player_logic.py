@@ -1,7 +1,8 @@
-from models import meta_data, turn_data
+from models import meta_data, round_data, turn_data
+from typing import Optional
 from game_logic import roll_dice
 from helper import load_round_data
-from game_logic import calculate_score_roll
+from game_logic import calculate_score_roll, find_dice_to_keep
 
 
 def player_play_round(
