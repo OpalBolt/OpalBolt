@@ -66,11 +66,14 @@ def roll_dice(num_dice: int) -> list:
     return [random.randint(1, 6) for _ in range(num_dice)]
 
 
-def check_game_end(game: game_data) -> game_data:
-    if game.game_score_player >= 10000 or game.game_score_opponent >= 10000:
-        game.game_ended = True
+def check_game_end(current_game: game_data) -> game_data:
+    if (
+        current_game.game_score_player >= 10000
+        or current_game.game_score_opponent >= 10000
+    ):
+        current_game.game_ended = True
 
-    return game
+    return current_game
 
 
 # converts the dice int to a string
