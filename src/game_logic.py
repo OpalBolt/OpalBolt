@@ -5,24 +5,24 @@ from models import round_data, turn_data, game_data
 
 
 def calculate_score_roll(
-    dice: list, turn: turn_data, dice_to_keep: Optional[list] = []
+    dice_to_calc_from: list, turn: turn_data, dice_to_keep: Optional[list] = []
 ) -> turn_data:
-    print(f"Dice rolled: {dice}")
+    print(f"Dice used to do calculations: {dice_to_calc_from}")
     _keep = False
 
     if dice_to_keep:
         for die in dice_to_keep:
-            if die not in dice:
+            if die not in dice_to_calc_from:
                 _keep = True
 
     if _keep:
         print("Invalid keep dice. Keeping all dice.")
         counts = Counter(dice_to_keep)
     else:
-        counts = Counter(dice)
+        counts = Counter(dice_to_calc_from)
 
     values = list(counts.values())
-    unique_numbers = set(dice)
+    unique_numbers = set(dice_to_calc_from)
     turn.score = 0
 
     if len(unique_numbers) == 6:
@@ -30,7 +30,7 @@ def calculate_score_roll(
         turn.score = 1500
         return turn
 
-    if len(dice) == 6 and values.count(2) == 3:
+    if len(dice_to_calc_from) == 6 and values.count(2) == 3:
         turn.dice_left = 6
         turn.score = 1000
         return turn
